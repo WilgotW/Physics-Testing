@@ -10,9 +10,10 @@ window.addEventListener('resize', function(){
 });
 
 class PhysicsObject{
-    constructor(x, y){
+    constructor(x, y, color){
         this.x = x ;
         this.y = y;
+        this.color = color
         this.width = 50;
         this.height = 50;
         this.yVelocity = 0;
@@ -21,7 +22,7 @@ class PhysicsObject{
         this.gravityScale = 1;
     }
     draw(){
-        c.fillStyle = 'black';
+        c.fillStyle = this.color;
         c.fillRect(this.x, this.y, this.width, this.height);
     }
     calcPhysics(){
@@ -42,6 +43,7 @@ const ground = {
 }
 
 let physObjects = [];
+let unvalidBlocks = [];
 const canvasBackground = 'white';
 const mouse = {
     x: 0,
@@ -56,8 +58,8 @@ window.addEventListener('mousedown', function(){
     for(i = 0; i < physObjects.length; i++){
         if(mouse.x + physObjects[i].width > physObjects[i].x && mouse.x < physObjects[i].x + physObjects[i].width){
             if(mouse.y + physObjects[i].height > physObjects[i].y && mouse.y < physObjects[i].y + physObjects[i].height){
-                c.fillStyle = "red"
-                c.fillRect(mouse.x, mouse.y, physObjects[i].width, physObjects[i].height);
+                unvalidBlocks.push(new PhysicsObject(mouse.x, mouse.y, 'rgba(255, 0, 0, 0.2)'));
+                setTimeout(removeBlock, 100);
                 return;
             }      
         }
@@ -65,7 +67,7 @@ window.addEventListener('mousedown', function(){
     if(mouse.y > ground.y){
         return;
     }
-    spawnObject();
+    physObjects.push(new PhysicsObject(mouse.x, mouse.y, 'black'));
 });
 
 function update(){
@@ -73,9 +75,9 @@ function update(){
     physObjects.forEach(physObject => {
         physObject.calcPhysics();
         physObject.draw();
-        
-        //check collisions:
-        
+    });
+    unvalidBlocks.forEach(block => {
+        block.draw();
     });
     checkCollisions(physObjects);
 
@@ -86,6 +88,10 @@ function update(){
     requestAnimationFrame(update);
 }
 update();
+
+function removeBlock(){
+    unvalidBlocks.splice(0, 1);
+}
 
 function checkCollisions(arr){
     for(let i = 0; i < arr.length; i++){
@@ -107,8 +113,4 @@ function checkCollisions(arr){
 function refrech(){
     c.fillStyle = canvasBackground;
     c.fillRect(0, 0, canvas.width, canvas.height);
-}
-
-function spawnObject(){
-    physObjects.push(new PhysicsObject(mouse.x, mouse.y));
 }
