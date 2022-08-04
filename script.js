@@ -12,21 +12,23 @@ class PhysicsObject{
     constructor(x, y){
         this.x = x ;
         this.y = y;
-        this.width = 10;
-        this.height = 10;
+        this.width = 100;
+        this.height = 100;
+        this.yVelocity = 0;
+        this.xVelocity = 0;
         this.mass = 0.5;
-        this.moveSpeed = 1;
+        this.gravityScale = 1;
     }
     draw(){
         c.fillStyle = 'black';
-        c.fillRect(this.x - this.width/2, this.y - this.height/2, this.width, this.height);
+        c.fillRect(this.x, this.y, this.width, this.height);
     }
     calcPhysics(){
         //gravity:
-        if(this.y + this.height/2 > ground.y){
-            this.moveSpeed = 0;
+        if(this.y + this.height > ground.y){
+            this.gravityScale = 0;
         }
-        this.y += this.mass * this.moveSpeed;
+        this.y += this.mass * this.gravityScale;
         
     }
 }
@@ -60,21 +62,30 @@ function update(){
         //check collisions:
         
     });
+    checkCollisions();
+
     c.fillStyle = "black";
     c.fillRect(ground.x, ground.y, canvas.width, 3);
 
+    
     requestAnimationFrame(update);
 }
 update();
 
 function checkCollisions(){
-    //object a
-    for(i = 0; i < physObjects.length, i++;){
-        //checks with object b
-        for(z = i+1; z < physObjects.length, z++;){
-
+    for(let i = 0; i < physObjects.length; i++){
+        for(let z = i+1; z < physObjects.length; z++){
+            //x touching:
+            if(physObjects[i].x + physObjects[i].width > physObjects[z].x && physObjects[i].x < physObjects[z].x + physObjects[z].width){
+                //y touching:
+                if(physObjects[i].y + physObjects[i].height > physObjects[z].y && physObjects[i].y < physObjects[z].y + physObjects[z].height){
+                    physObjects[z].gravityScale = 0;
+                }
+            }
+            
         }
     }
+    
 }
 
 function refrech(){
