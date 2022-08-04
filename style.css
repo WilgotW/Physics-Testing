@@ -1,0 +1,15 @@
+body{
+    margin: 0;
+    padding: 0;
+
+
+}
+canvas{
+    background: orange;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+}
+div{
+    margin: 0;
+}
