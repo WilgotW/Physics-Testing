@@ -6,17 +6,18 @@ canvas.height = window.innerHeight;
 window.addEventListener('resize', function(){
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    ground.y = canvas.height - canvas.height/10
 });
 
 class PhysicsObject{
     constructor(x, y){
         this.x = x ;
         this.y = y;
-        this.width = 100;
-        this.height = 100;
+        this.width = 50;
+        this.height = 50;
         this.yVelocity = 0;
         this.xVelocity = 0;
-        this.mass = 0.5;
+        this.mass = 1;
         this.gravityScale = 1;
     }
     draw(){
@@ -27,8 +28,10 @@ class PhysicsObject{
         //gravity:
         if(this.y + this.height > ground.y){
             this.gravityScale = 0;
+            this.y = ground.y - this.height
         }
-        this.y += this.mass * this.gravityScale;
+        this.yVelocity += this.mass * this.gravityScale;
+        this.y += this.yVelocity * this.gravityScale;
         
     }
 }
@@ -50,6 +53,18 @@ window.addEventListener('mousemove', function(event){
     mouse.y = event.y;
 });
 window.addEventListener('mousedown', function(){
+    for(i = 0; i < physObjects.length; i++){
+        if(mouse.x + physObjects[i].width > physObjects[i].x && mouse.x < physObjects[i].x + physObjects[i].width){
+            if(mouse.y + physObjects[i].height > physObjects[i].y && mouse.y < physObjects[i].y + physObjects[i].height){
+                c.fillStyle = "red"
+                c.fillRect(mouse.x, mouse.y, physObjects[i].width, physObjects[i].height);
+                return;
+            }      
+        }
+    }
+    if(mouse.y > ground.y){
+        return;
+    }
     spawnObject();
 });
 
@@ -62,7 +77,7 @@ function update(){
         //check collisions:
         
     });
-    checkCollisions();
+    checkCollisions(physObjects);
 
     c.fillStyle = "black";
     c.fillRect(ground.x, ground.y, canvas.width, 3);
@@ -72,14 +87,15 @@ function update(){
 }
 update();
 
-function checkCollisions(){
-    for(let i = 0; i < physObjects.length; i++){
-        for(let z = i+1; z < physObjects.length; z++){
+function checkCollisions(arr){
+    for(let i = 0; i < arr.length; i++){
+        for(let z = i+1; z < arr.length; z++){
             //x touching:
-            if(physObjects[i].x + physObjects[i].width > physObjects[z].x && physObjects[i].x < physObjects[z].x + physObjects[z].width){
+            if(arr[i].x + arr[i].width > arr[z].x && arr[i].x < arr[z].x + arr[z].width){
                 //y touching:
-                if(physObjects[i].y + physObjects[i].height > physObjects[z].y && physObjects[i].y < physObjects[z].y + physObjects[z].height){
-                    physObjects[z].gravityScale = 0;
+                if(arr[i].y + arr[i].height > arr[z].y && arr[i].y < arr[z].y + arr[z].height){
+                    arr[z].gravityScale = 0;
+                    arr[z].y = arr[i].y - arr[z].height;
                 }
             }
             
